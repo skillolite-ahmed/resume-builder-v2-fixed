@@ -58,7 +58,7 @@ export const ModernMinimal: React.FC<ModernMinimalProps> = ({ resume, sheetRef }
 
       {sections.map(section => (
         <section key={section.id} className="modern-section">
-          <h2 className="modern-section-title">{section.title}</h2>
+          {section.title && <h2 className="modern-section-title">{section.title}</h2>}
 
           {section.content && <p className="modern-content">{section.content}</p>}
 
@@ -67,7 +67,7 @@ export const ModernMinimal: React.FC<ModernMinimalProps> = ({ resume, sheetRef }
               {section.skillCategories.map((cat, idx) => (
                 <div key={idx} className="modern-skill-row">
                   {cat.category && <strong>{cat.category}:</strong>}
-                  <span>{cat.skills.join(', ')}</span>
+                  {cat.skills && cat.skills.length > 0 && <span>{cat.skills.join(', ')}</span>}
                 </div>
               ))}
             </div>
@@ -75,33 +75,38 @@ export const ModernMinimal: React.FC<ModernMinimalProps> = ({ resume, sheetRef }
 
           {section.entries && section.entries.length > 0 && (
             <div className="modern-entry-list">
-              {section.entries.map(entry => (
-                <article key={entry.id} className="modern-entry">
-                  {(entry.title || entry.date) && (
-                    <div className="modern-entry-head">
-                      {entry.title && <div className="modern-entry-title">{entry.title}</div>}
-                      {entry.date && <div className="modern-entry-date">{entry.date}</div>}
-                    </div>
-                  )}
+              {section.entries.map(entry => {
+                const entryMetaItems = [entry.subtitle, entry.location].filter(Boolean);
 
-                  {(entry.subtitle || entry.location) && (
-                    <div className="modern-entry-meta">
-                      {entry.subtitle && <span>{entry.subtitle}</span>}
-                      {entry.location && <span>{entry.location}</span>}
-                    </div>
-                  )}
+                return (
+                  <article key={entry.id} className="modern-entry">
+                    {(entry.title || entry.date) && (
+                      <div className="modern-entry-head">
+                        {entry.title && <div className="modern-entry-title">{entry.title}</div>}
+                        {entry.date && <div className="modern-entry-date">{entry.date}</div>}
+                      </div>
+                    )}
 
-                  {entry.description && <p className="modern-entry-desc">{entry.description}</p>}
+                    {entryMetaItems.length > 0 && (
+                      <div className="modern-entry-meta">
+                        {entryMetaItems.map((item, idx) => (
+                          <span key={`${entry.id}-meta-${idx}`}>{item}</span>
+                        ))}
+                      </div>
+                    )}
 
-                  {entry.bullets && entry.bullets.length > 0 && (
-                    <ul className="modern-bullets">
-                      {entry.bullets.map((bullet, idx) => (
-                        <li key={idx}>{bullet}</li>
-                      ))}
-                    </ul>
-                  )}
-                </article>
-              ))}
+                    {entry.description && <p className="modern-entry-desc">{entry.description}</p>}
+
+                    {entry.bullets && entry.bullets.length > 0 && (
+                      <ul className="modern-bullets">
+                        {entry.bullets.map((bullet, idx) => (
+                          <li key={idx}>{bullet}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
@@ -109,3 +114,4 @@ export const ModernMinimal: React.FC<ModernMinimalProps> = ({ resume, sheetRef }
     </div>
   );
 };
+
