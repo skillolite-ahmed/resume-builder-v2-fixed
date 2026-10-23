@@ -1,0 +1,46 @@
+BISWA LAKSHMI RAJKUMARI
+blakshmir7@gmail.com  |  +91 7099560495  |  github.com  |  linkedin.com
+PROFESSIONAL SUMMARY
+Economics graduate passionate about data analytics, economic research, and problem-solving. Currently
+building skills in Power BI, Excel, and data visualization through hands-on projects and continuous learning.
+EXPERIENCE
+Data Services Consultant (Intern)  Toddle - Your Teaching Partner
+Unknown Company
+• Bangalore Urban, Karnataka, India | Remote | Full-time
+Unknown Title May 2026 – Aug 2026
+Unknown Company
+• Support data processing and management tasks, including organizing, formatting, and maintaining large
+datasets
+• Ensure data accuracy, perform data entry operations, and create structured units for efficient use
+• Work regularly with spreadsheets and internal systems to handle data efficiently, verify information, and
+maintain
+• quality standards
+• Developed strong attention to detail, time management, and data handling skills
+EDUCATION
+Master of Arts — Economics  Mount Carmel University, Bengaluru 2026 – Present
+Bachelor of Arts — Economics  B. Borooah College, Gauhati University
+Apr 2022 – Jun 2025
+CGPA: 7.58 | Key Subjects: Microeconomics, Macroeconomics, Statistics, Econometrics, Research
+Methodology, Indian
+Economy Activities: National Youth Festival  — Gold in Hindustani Classical Music (Gauhati University)2024
+PROJECTS
+Unknown Title | Labour Market Analysis in India ()
+Tools: Microsoft Excel | Power BI | DAX     Data Sources: ILO | World Bank WDI | PLFS (MOSPI)
+Unknown Title | Unknown Company
+An independent data-driven research project analysing 35 years of structural dynamics in India's labour market
+using
+Microsoft Excel and Power BI.
+• Collected and merged 6 datasets from ILO, World Bank WDI and PLFS (MOSPI) using XLOOKUP in Excel
+• Created 4 custom derived metrics - Skill Mismatch Index, Gender Gap, Educated Unemployment Proxy and
+Youth
+Vulnerability Index
+• Built interactive Power BI dashboard with 4 DAX KPI cards, 5 charts and a GDP gauge visual
+Key Findings:
+• Skill Mismatch Index worsened from 2.64 to 3.80 over 35 years, confirming structural deterioration
+• Youth unemployment is 3.80x higher than adult unemployment in 2025
+• Gender gap of 45 points persists in workforce participation
+• Agriculture fell from 63% to 41%, indicating a major structural employment shift
+Github Repository: Labour Market Analysis India Dashboard View
+SKILLS
+Microsoft Excel, Microsoft Power BI, Data Cleaning & Validation, Data Visualization, Domain Knowledge,
+Consumer Behavior, Policy Analysis, Economic Research

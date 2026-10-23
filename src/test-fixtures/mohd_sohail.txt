@@ -1,0 +1,52 @@
+Mohd Sohail
+warsi.sahil93@gmail.com8630875543 Gurugram, Haryana linkedin.com/in/mohd-sohail-76078910b
+PROFESSIONAL SUMMARY
+Analytical Operations and Data Analyst with over 6 years of experience optimizing business workflows and CRM management. Expert
+in leveraging SQL, Python, Power BI, and Advanced Excel to drive data-informed decision-making and process automation. Proven
+track record of enhancing operational efficiency and business performance through cross-functional collaboration and strategic KPI
+tracking.
+PROFESSIONAL EXPERIENCE
+Assistant Manager Nov 2025–Present
+M1xchange
+Oversee end-to-end operational transactions exceeding ₹250 Cr on the TReDS platform while maintaining rigorous compliance and
+reporting standards. Develop comprehensive MIS reports to monitor transaction volumes, settlement cycles, and operational bottlenecks
+across Strategic and Large Corporate Groups. Optimize workflow efficiency by tracking critical business KPIs and coordinating efforts
+between vendors, corporate buyers, and financiers. Drive platform adoption and operational compliance by delivering technical training and
+system demonstrations to corporate clients.
+Business Operations Owner Oct 2023–Present
+Self Employed
+Monitor daily revenue, stock turnover, and monthly business KPIs using Advanced Excel to maintain precise operational and sales records.
+Refine re-ordering cycles, pricing strategies, and internal workflows through rigorous data analysis of inventory and sales metrics.
+Senior Relationship Manager Jun 2022–Sep 2023
+Enkash
+Enhance team productivity and data integrity by managing client onboarding and pipeline workflows within Zoho CRM. Reduce turnaround
+time (TAT) by 20% through the analysis of sales pipeline trends and operational process improvements. Drive monthly disbursements
+exceeding ₹5 Cr by utilizing data-driven client segmentation and cross-functional execution strategies.
+Relationship Manager Feb 2021–May 2023
+Indifi Technologies Pvt. Ltd.
+Leverage CRM platforms to track client interactions, monitor operational performance, and automate the generation of performance reports.
+Increase client retention by 15% through proactive service tracking and lifecycle management across India. Streamline processing
+workflows and optimize credit utilization by collaborating with risk, underwriting, and product teams.
+Senior Associate Sales Consultant Oct 2017–Jan 2021
+Policybazaar.com
+Maintain high data integrity while executing over 180 daily interactions within CRM software. Generate over ₹1 Cr in annual premium sales
+through disciplined lead management and performance tracking.
+SKILLS
+Technical & Business: MIS Reporting, CRM Management (Zoho), Process Improvement, KPI Tracking, Workflow Automation,
+Stakeholder Management, Advanced Excel, Pivot Tables, VLOOKUP, Dashboarding, Power BI, SQL, Joins, CTEs, Window Functions,
+Python, Pandas, NumPy, Matplotlib, Seaborn, Cross-Functional Collaboration, Strategic Partnerships, Data Interpretation, Quality Control
+& Compliance
+EDUCATION & CERTIFICATIONS
+Master of Business Administration (MBA) Graphic Era Hill University
+Professional Certification in Data Analytics (SQL, Python, Power BI, Advanced Excel) 2017
+PROJECTS
+ERP Sales Performance Dashboard: Built automated Power BI dashboards using SQL and Python to track sales KPIs and inventory
+turnover, reducing manual reporting effort by 35%.
+Airbnb Data & Market Analysis: Conducted Exploratory Data Analysis (EDA) using Python (Pandas, NumPy, Seaborn) to evaluate
+pricing trends and generate visual dashboards for operational optimization.
+KEY ACHIEVEMENTS
+Oversaw end-to-end operational transactions exceeding ₹250 Cr on the TReDS platform.
+Reduced turnaround time (TAT) by 20% through the analysis of sales pipeline trends.
+Drive monthly disbursements exceeding ₹5 Cr by utilizing data-driven client segmentation.
+Increase client retention by 15% through proactive service tracking.
+Generate over ₹1 Cr in annual premium sales through disciplined lead management.
