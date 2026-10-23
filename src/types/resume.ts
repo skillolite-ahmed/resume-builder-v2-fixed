@@ -47,11 +47,13 @@ export interface ResumeSection {
   rawText?: string;
 }
 
+export type ResumeTemplateId = 'professional-classic' | 'modern-minimal';
+
 export interface ResumeData {
   contact: ContactInfo;
   sections: ResumeSection[];
   rawText: string;
-  templateId: 'professional-classic';
+  templateId: ResumeTemplateId;
   density?: 'auto' | 'compact' | 'spacious';
 }
 

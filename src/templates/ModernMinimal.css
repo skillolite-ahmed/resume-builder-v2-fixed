@@ -1,0 +1,129 @@
+.resume-sheet.modern-template {
+  width: 794px;
+  min-height: 1123px;
+  background: #ffffff;
+  color: #1f2937;
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 42px 38px;
+  box-sizing: border-box;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+.modern-header {
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+}
+
+.modern-name {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #111827;
+}
+
+.modern-contact-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-top: 10px;
+  font-size: 11px;
+  color: #475569;
+}
+
+.modern-contact-item {
+  white-space: nowrap;
+}
+
+.modern-contact-item a {
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.modern-section {
+  margin-top: 16px;
+}
+
+.modern-section-title {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #0f766e;
+}
+
+.modern-content,
+.modern-entry-desc {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #374151;
+}
+
+.modern-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.modern-skill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.modern-entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modern-entry {
+  padding-top: 6px;
+}
+
+.modern-entry-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.modern-entry-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.modern-entry-date {
+  font-size: 10px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.modern-entry-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+  font-size: 10px;
+  color: #475569;
+}
+
+.modern-bullets {
+  margin: 6px 0 0 0;
+  padding-left: 18px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.modern-bullets li + li {
+  margin-top: 3px;
+}
