@@ -95,7 +95,7 @@ export const ProfessionalClassic: React.FC<ProfessionalClassicProps> = ({ resume
       {/* Sections */}
       {sections.map(section => (
         <section key={section.id} className="resume-section" data-section-type={section.type}>
-          <h2 className="resume-section-title">{section.title}</h2>
+          {section.title && <h2 className="resume-section-title">{section.title}</h2>}
 
           {/* Simple text content (e.g. Summary, Objectives, Custom Notes) */}
           {section.content && (
@@ -110,7 +110,7 @@ export const ProfessionalClassic: React.FC<ProfessionalClassicProps> = ({ resume
                   {cat.category && (
                     <strong className="resume-skill-cat-title">{cat.category}: </strong>
                   )}
-                  <span>{cat.skills.join(', ')}</span>
+                  {cat.skills && cat.skills.length > 0 && <span>{cat.skills.join(', ')}</span>}
                 </div>
               ))}
             </div>
@@ -119,41 +119,51 @@ export const ProfessionalClassic: React.FC<ProfessionalClassicProps> = ({ resume
           {/* Structured Entries (Experience, Education, Projects, Certifications, Awards, etc.) */}
           {section.entries && section.entries.length > 0 && (
             <div className="resume-entries-block">
-              {section.entries.map(entry => (
-                <article key={entry.id} className="resume-entry">
-                  {/* Title and Date row */}
-                  {(entry.title || entry.date) && (
-                    <div className="resume-entry-header">
-                      {entry.title && <div className="resume-entry-title">{entry.title}</div>}
-                      {entry.date && <div className="resume-entry-date">{entry.date}</div>}
-                    </div>
-                  )}
+              {section.entries.map(entry => {
+                const entryMetaItems = [entry.subtitle, entry.location].filter(Boolean);
 
-                  {/* Subtitle (Company / School) and Location row */}
-                  {(entry.subtitle || entry.location) && (
-                    <div className="resume-entry-subline">
-                      {entry.subtitle && <span className="resume-entry-subtitle">{entry.subtitle}</span>}
-                      {entry.location && <span className="resume-entry-location">{entry.location}</span>}
-                    </div>
-                  )}
+                return (
+                  <article key={entry.id} className="resume-entry">
+                    {/* Title and Date row */}
+                    {(entry.title || entry.date) && (
+                      <div className="resume-entry-header">
+                        {entry.title && <div className="resume-entry-title">{entry.title}</div>}
+                        {entry.date && <div className="resume-entry-date">{entry.date}</div>}
+                      </div>
+                    )}
 
-                  {/* Entry Description */}
-                  {entry.description && (
-                    <p className="resume-entry-desc">{entry.description}</p>
-                  )}
+                    {/* Subtitle (Company / School) and Location row */}
+                    {entryMetaItems.length > 0 && (
+                      <div className="resume-entry-subline">
+                        {entryMetaItems.map((item, index) => (
+                          <span
+                            key={`${entry.id}-meta-${index}`}
+                            className={index === 0 ? 'resume-entry-subtitle' : 'resume-entry-location'}
+                          >
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
-                  {/* Bullet points */}
-                  {entry.bullets && entry.bullets.length > 0 && (
-                    <ul className="resume-bullets-list">
-                      {entry.bullets.map((bullet, bIdx) => (
-                        <li key={bIdx} className="resume-bullet-item">
-                          {bullet}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </article>
-              ))}
+                    {/* Entry Description */}
+                    {entry.description && (
+                      <p className="resume-entry-desc">{entry.description}</p>
+                    )}
+
+                    {/* Bullet points */}
+                    {entry.bullets && entry.bullets.length > 0 && (
+                      <ul className="resume-bullets-list">
+                        {entry.bullets.map((bullet, bIdx) => (
+                          <li key={bIdx} className="resume-bullet-item">
+                            {bullet}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
@@ -161,3 +171,4 @@ export const ProfessionalClassic: React.FC<ProfessionalClassicProps> = ({ resume
     </div>
   );
 };
+

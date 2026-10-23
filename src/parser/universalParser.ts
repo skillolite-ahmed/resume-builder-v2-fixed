@@ -11,7 +11,7 @@ const SECTION_MAPPINGS: { pattern: RegExp; type: SectionType }[] = [
     type: 'experience',
   },
   {
-    pattern: /^education\s*(?:&|and)\s*certifications$/i,
+    pattern: /^education(?:\s*&(?:amp;)?\s*(?:credentials|certifications))?$/i,
     type: 'education',
   },
   {
@@ -49,8 +49,83 @@ const SECTION_MAPPINGS: { pattern: RegExp; type: SectionType }[] = [
 ];
 
 // Date detection regex matching common formats
-const DATE_RANGE_REGEX = /(?:(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)[,\s.]+(?:\d{4}|\d{2})|\b(?:19|20)\d{2}\b)\s*(?:–|-|—|to|\/)\s*(?:Present|Current|Ongoing|(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)[,\s.]+(?:\d{4}|\d{2})|\b(?:19|20)\d{2}\b)/i;
-const SINGLE_DATE_REGEX = /(?:(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)[,\s.]+(?:19|20)\d{2}|\b(?:19|20)\d{2}\b)/i;
+const DATE_RANGE_REGEX = /(?:(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)[,\s.]+(?:\d{4}|\d{2})|(?:19|20)\d{2}\s*(?:-|–|—|to)\s*(?:Present|Current|Ongoing|(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)[,\s.]*\d{4}|(?:19|20)\d{2}))?/i;
+const SINGLE_DATE_REGEX = /(?:(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)[,\s.]+(?:19|20)\d{2}|(?:19|20)\d{2})/i;
+
+function splitTitleCompany(value: string): { title?: string; subtitle?: string } {
+  const clean = value.replace(/\s+/g, ' ').trim();
+  if (!clean || clean.includes('|')) return {};
+
+  const dashMatch = clean.match(/^(.+?)\s*[-–—]\s*(.+)$/);
+  if (!dashMatch) return {};
+
+  const left = dashMatch[1].trim();
+  const right = dashMatch[2].trim();
+
+  if (!left || !right) return {};
+  if (/^(?:Remote|India|USA|UK|Canada|Delhi|Gurugram|Noida|Bengaluru|Bangalore|Mumbai|Hyderabad|Pune|Chennai|Kolkata|London|New Delhi|California|New York)$/i.test(right)) {
+    return { title: left, subtitle: right };
+  }
+
+  if (left.length <= 3 || right.length <= 1) return {};
+  return { title: left, subtitle: right };
+}
+
+function splitLumpedExperienceLine(line: string): Partial<ResumeEntry> {
+  const normalized = line
+    .replace(/\s*\|\s*/g, ' | ')
+    .replace(/\s*[-–—]\s*/g, ' - ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+  if (!normalized) return {};
+  const parts = normalized
+    .split(/\s*\|\s*/)
+    .map(p => p.trim())
+    .filter(Boolean);
+
+  if (parts.length === 0) return {};
+
+  const parsed: Partial<ResumeEntry> = {};
+  const datePartIndex = parts.findIndex(part => DATE_RANGE_REGEX.test(part) || SINGLE_DATE_REGEX.test(part));
+  const locationPartIndex = parts.findIndex(part => /Remote|Gurugram|Noida|Delhi|Bangalore|Bengaluru|Mumbai|Hyderabad|Pune|Chennai|Kolkata|India|USA|UK|Canada|London|California|New York|\b[A-Z][a-z]+,\s*[A-Z][a-z]+\b/i.test(part));
+
+  if (datePartIndex >= 0) {
+    parsed.date = parts[datePartIndex].trim();
+  }
+
+  if (locationPartIndex >= 0 && locationPartIndex !== datePartIndex) {
+    parsed.location = parts[locationPartIndex].trim();
+  }
+
+  const titleSource = parts[0] || '';
+  const titleParts = titleSource.split(/\s+-\s+/).map(p => p.trim()).filter(Boolean);
+
+  if (titleParts.length >= 2 && !DATE_RANGE_REGEX.test(titleSource)) {
+    parsed.title = titleParts[0];
+    parsed.subtitle = titleParts.slice(1).join(' - ');
+  } else if (titleSource && !DATE_RANGE_REGEX.test(titleSource) && !/^(?:Remote|India|USA|UK|Canada|London|Delhi|Gurugram|Noida|Bengaluru|Bangalore|Mumbai|Hyderabad|Pune|Chennai|Kolkata)$/i.test(titleSource)) {
+    parsed.title = titleSource;
+  }
+
+  if (parts.length > 1) {
+    const trailingParts = parts.filter(part => part !== parsed.date && part !== parsed.location && part !== parsed.title && part !== parsed.subtitle);
+    if (!parsed.subtitle && trailingParts.length > 0) {
+      parsed.subtitle = trailingParts[0];
+    }
+  }
+
+  if (!parsed.title && parts.length > 1) {
+    const first = parts[0];
+    const firstTitleParts = splitTitleCompany(first);
+    if (firstTitleParts.title) {
+      parsed.title = firstTitleParts.title;
+      parsed.subtitle = firstTitleParts.subtitle || parsed.subtitle;
+    }
+  }
+
+  return parsed;
+}
 
 /**
  * Clean up raw text (null bytes, invalid chars, unicode dash normalization)
@@ -65,7 +140,12 @@ export function sanitizeRawText(text: string): string {
     // Normalize quotes
     .replace(/[\u2018\u2019]/g, "'")
     .replace(/[\u201C\u201D]/g, '"')
-    // Remove weird mojibake artifacts like 'ã ' or ''
+    // Fix common OCR / noisy text artefacts
+    .replace(/\bSOL\b/gi, 'SQL')
+    .replace(/\bPower\s+El\b/gi, 'Power BI')
+    .replace(/\bPower\s+BI\b/gi, 'Power BI')
+    .replace(/\bPage\s+\d+\b/gi, '')
+    .replace(/^\s*[-*•·▪◆]+\s*/gm, '')
     .replace(/[ãâà¸¬]+/g, ' ')
     .replace(/\uFFFD/g, ' ')
     // Normalize line endings
@@ -200,7 +280,7 @@ function matchSectionHeading(line: string, isFirstNonEmptyLine: boolean): Sectio
 
   // Check if line starts with a known section keyword followed by an entry on same line
   // e.g., "EXPERIENCE OASIS INFOBYTE" or "Projects Blood Bank Management System"
-  const firstWordMatch = trimmed.match(/^(EXPERIENCE|PROJECTS|CERTIFICATIONS|EDUCATION|SKILLS|PUBLICATIONS|AWARDS)\s+(.+)$/i);
+  const firstWordMatch = trimmed.match(/^(EXPERIENCE|PROJECTS|CERTIFICATIONS|EDUCATION|SKILLS|PUBLICATIONS|AWARDS|EDUCATION\s*&\s*CREDENTIALS)\s+(.+)$/i);
   if (firstWordMatch) {
     const headingWord = firstWordMatch[1];
     const remainder = firstWordMatch[2];
@@ -286,6 +366,23 @@ function parseEntries(lines: string[]): ResumeEntry[] {
 
     // Check if line has pipe delimiters: e.g. "Web Developer Intern | Oasis InfoByte | April 2023 - May 2023"
     if (line.includes('|')) {
+      const lumped = splitLumpedExperienceLine(line);
+      const hasStructuredFields = Boolean(lumped.title || lumped.subtitle || lumped.location || lumped.date);
+
+      if (hasStructuredFields) {
+        commitEntry();
+        currentEntry = {
+          id: `entry-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          title: lumped.title,
+          subtitle: lumped.subtitle,
+          location: lumped.location,
+          date: lumped.date,
+          bullets: [],
+        };
+        i++;
+        continue;
+      }
+
       const parts = line.split('|').map(p => p.trim()).filter(Boolean);
       commitEntry();
       currentEntry = {
@@ -402,7 +499,13 @@ function parseEntries(lines: string[]): ResumeEntry[] {
 
     // If currentEntry has a title but no subtitle and no bullets, this line might be the company/location
     if (currentEntry && !currentEntry.subtitle && (!currentEntry.bullets || currentEntry.bullets.length === 0)) {
-      if (/Remote|Urban|Karnataka|Delhi|India|USA|UK|Full-time|Part-time|Intern/i.test(line)) {
+      const lumpedLine = splitLumpedExperienceLine(line);
+      if (Object.keys(lumpedLine).length > 0) {
+        currentEntry.title = lumpedLine.title || currentEntry.title;
+        currentEntry.subtitle = lumpedLine.subtitle || currentEntry.subtitle;
+        currentEntry.location = lumpedLine.location || currentEntry.location;
+        currentEntry.date = lumpedLine.date || currentEntry.date;
+      } else if (/Remote|Urban|Karnataka|Delhi|India|USA|UK|Full-time|Part-time|Intern/i.test(line)) {
         currentEntry.location = line;
       } else {
         currentEntry.subtitle = line;
@@ -413,7 +516,7 @@ function parseEntries(lines: string[]): ResumeEntry[] {
 
     // If currentEntry has title and subtitle, but no location yet, check if this line is location
     if (currentEntry && currentEntry.subtitle && !currentEntry.location && (!currentEntry.bullets || currentEntry.bullets.length === 0)) {
-      if (/Hong Kong|Remote|Urban|Karnataka|Delhi|India|USA|UK|Canada|California|New York|London/i.test(line) || /^[A-Z][a-zA-Z\s]+,\s*[A-Z][a-zA-Z\s]+$/.test(line) || line.split(/\s+/).length <= 3) {
+      if (/Hong Kong|Remote|Urban|Karnataka|Delhi|India|USA|UK|Canada|California|New York|London/i.test(line) || /^[A-Z][a-zA-Z\s]+,\s*[A-Z][a-zA-Z\s]+$/.test(line) || line.split(/\s+/).length <= 4) {
         currentEntry.location = line;
         i++;
         continue;
@@ -451,13 +554,13 @@ function parseSkills(lines: string[]): SkillCategory[] {
     if (colonIdx > 0 && colonIdx < 45) {
       const catName = line.substring(0, colonIdx).trim();
       const skillsText = line.substring(colonIdx + 1).trim();
-      const skills = skillsText.split(/[,•·|/]/).map(s => s.trim()).filter(Boolean);
+      const skills = skillsText.split(/[,:•·|/]/).map(s => s.trim()).filter(Boolean);
       categories.push({
         category: catName,
         skills: skills.length > 0 ? skills : [skillsText],
       });
     } else {
-      const skills = line.split(/[,•·|]/).map(s => s.trim()).filter(Boolean);
+      const skills = line.split(/[,:•·|/]/).map(s => s.trim()).filter(Boolean);
       if (skills.length > 0) {
         categories.push({
           skills,
@@ -485,7 +588,6 @@ export function parseResume(rawInput: string): ResumeData {
     }
   }
 
-  // Find section header indices
   interface SectionHeaderLoc {
     index: number;
     match: SectionHeadingMatch;
@@ -502,20 +604,17 @@ export function parseResume(rawInput: string): ResumeData {
     }
   }
 
-  // Header lines are everything before the first recognized section
   const firstHeaderIdx = headerLocs.length > 0 ? headerLocs[0].index : rawLines.length;
   const headerLines = rawLines.slice(0, firstHeaderIdx).filter(l => l.trim().length > 0);
   const contact = extractContact(headerLines);
 
   const sections: ResumeSection[] = [];
 
-  // Parse each section according to boundaries
   for (let h = 0; h < headerLocs.length; h++) {
     const currentLoc = headerLocs[h];
     const nextIndex = h + 1 < headerLocs.length ? headerLocs[h + 1].index : rawLines.length;
 
     let sectionLines = rawLines.slice(currentLoc.index + 1, nextIndex);
-    // If the header had remainder on the same line (e.g. "EXPERIENCE OASIS INFOBYTE"), prepend remainder
     if (currentLoc.match.remainder) {
       sectionLines = [currentLoc.match.remainder, ...sectionLines];
     }
@@ -562,3 +661,4 @@ export function parseResume(rawInput: string): ResumeData {
     templateId: 'professional-classic',
   };
 }
+
