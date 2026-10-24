@@ -3,7 +3,15 @@ import {
   type GenerateContentRequest,
 } from '@google/generative-ai';
 
-import type { ResumeData } from '../types/resume';
+import type { 
+  ResumeData, 
+  ContactInfo, 
+  ResumeEntry, 
+  ResumeSection, 
+  SectionType, 
+  TemplateId, 
+  DensityMode 
+} from '../types/resume';
 
 const DEFAULT_TEMPLATE_ID: TemplateId = 'professional-classic';
 const DEFAULT_DENSITY: DensityMode = 'auto';
