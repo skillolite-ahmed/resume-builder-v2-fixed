@@ -57,11 +57,21 @@ CRITICAL RULES FOR SCRAPED PDF TEXT:
 6. Return ONLY JSON. No markdown blocks.
 
 Resume text:
-\${text}
+${text}
 `;
 
-  const result = await model.generateContent(prompt);
-  const response = result.response.text();
-  const cleaned = response.replace(/```json/g, '').replace(/```/g, '').trim();
-  return JSON.parse(cleaned);
+  try {
+    const result = await model.generateContent(prompt);
+    const response = result.response.text();
+    
+    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("AI did not return a valid JSON object.");
+    }
+    
+    return JSON.parse(jsonMatch[0]);
+  } catch (error: any) {
+    console.error("Gemini API Error:", error);
+    throw new Error(error.message || 'Failed to generate AI content');
+  }
 }
