@@ -41,20 +41,20 @@ export default function App() {
     return validateResume(resumeData);
   }, [resumeData]);
 
-  // Handler for parsing raw input text
-const handleParse = async () => {
+// Handler for parsing raw input text
+  const handleParse = async () => {
     if (!inputText.trim()) return;
     setSelectedSampleId('');
     setIsParsing(true);
     
     try {
-      // 1. Try to parse with Gemini first
       const parsed = await parseResumeWithGemini(inputText);
       setResumeData(parsed);
       setActiveTab('editor');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Gemini parsing failed, falling back to local parser:', err);
-      // 2. Fallback to original local parsing if the API fails
+      alert(`Gemini AI failed: ${err.message}. Falling back to standard parser.`);
+      
       const fallback = parseResume(inputText);
       setResumeData(fallback);
       setActiveTab('editor');
@@ -62,7 +62,6 @@ const handleParse = async () => {
       setIsParsing(false);
     }
   };
-
   // Reference samples are preview-only: never place sample content in the user's paste box.
   // Choosing the blank option clears all current content, including previously pasted data.
   const handleLoadSample = (sampleId: string) => {
