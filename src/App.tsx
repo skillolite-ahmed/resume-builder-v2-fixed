@@ -6,6 +6,7 @@ import { ResumeEditor } from './components/ResumeEditor';
 import { ValidationPanel } from './components/ValidationPanel';
 import { ResumePreview } from './components/ResumePreview';
 import { SAMPLE_RESUMES } from './test-fixtures/sampleResumes';
+import { parseResumeWithGemini } from './utils/geminiParser';
 import {
   FileText,
   Edit3,
@@ -41,16 +42,25 @@ export default function App() {
   }, [resumeData]);
 
   // Handler for parsing raw input text
-  const handleParse = () => {
+const handleParse = async () => {
     if (!inputText.trim()) return;
     setSelectedSampleId('');
     setIsParsing(true);
-    setTimeout(() => {
-      const parsed = parseResume(inputText);
+    
+    try {
+      // 1. Try to parse with Gemini first
+      const parsed = await parseResumeWithGemini(inputText);
       setResumeData(parsed);
-      setIsParsing(false);
       setActiveTab('editor');
-    }, 250);
+    } catch (err) {
+      console.error('Gemini parsing failed, falling back to local parser:', err);
+      // 2. Fallback to original local parsing if the API fails
+      const fallback = parseResume(inputText);
+      setResumeData(fallback);
+      setActiveTab('editor');
+    } finally {
+      setIsParsing(false);
+    }
   };
 
   // Reference samples are preview-only: never place sample content in the user's paste box.
