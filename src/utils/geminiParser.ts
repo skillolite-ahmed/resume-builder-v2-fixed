@@ -1,13 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import type { 
-  ResumeData, 
-  ContactInfo, 
-  ResumeEntry, 
-  ResumeSection, 
-  SectionType, 
-  TemplateId, 
-  DensityMode 
-} from '../types/resume';
+import type { ResumeData } from '../types/resume';
 
 export async function parseResumeWithGemini(rawText: string): Promise<ResumeData> {
   const text = rawText?.trim?.() ?? '';
@@ -18,7 +10,6 @@ export async function parseResumeWithGemini(rawText: string): Promise<ResumeData
       sections: [],
       rawText: '',
       templateId: 'professional-classic',
-      density: 'auto',
     };
   }
 
@@ -104,8 +95,7 @@ Return JSON matching this exact structure:
     }
   ],
   "rawText": "",
-  "templateId": "professional-classic",
-  "density": "auto"
+  "templateId": "professional-classic"
 }
 
 CRITICAL RULES:
@@ -129,7 +119,6 @@ ${text}
     const parsedData = JSON.parse(jsonMatch[0]);
     parsedData.rawText = text;
     parsedData.templateId = parsedData.templateId || 'professional-classic';
-    parsedData.density = parsedData.density || 'auto';
     return parsedData;
   } catch (error: any) {
     console.error("Gemini Parsing Error:", error);
