@@ -32,8 +32,11 @@ export async function exportToPDFBlob(
   _element: HTMLElement,
   options?: PDFExportOptions
 ): Promise<Blob> {
+  const fileName = options?.filename ?? generateFilename(options?.candidateName);
+
   // Delegate to the native print path — this is the only reliable way to
   // produce a vector PDF with correct typography in a browser environment.
+  document.title = fileName.replace(/\.pdf$/i, '');
   printResume(options?.candidateName);
 
   // Return an empty blob as a placeholder; the actual file is saved by the
