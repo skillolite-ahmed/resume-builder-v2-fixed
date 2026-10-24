@@ -23,7 +23,9 @@ export async function parseResumeWithGemini(rawText: string): Promise<ResumeData
   });
 
   const prompt = `
-Extract resume information from the text below. Return valid JSON ONLY matching this exact structure:
+Extract complete resume information from the text below. Return valid JSON ONLY. No markdown, no conversational text.
+
+MANDATORY JSON STRUCTURE:
 {
   "contact": {
     "name": "Full Name",
@@ -58,7 +60,7 @@ Extract resume information from the text below. Return valid JSON ONLY matching 
       "title": "Skills",
       "type": "skills",
       "skillCategories": [
-        { "category": "Technical", "skills": ["SQL", "Python"] }
+        { "category": "Technical & Business", "skills": ["SQL", "Python", "Power BI", "Advanced Excel"] }
       ]
     },
     {
@@ -68,8 +70,8 @@ Extract resume information from the text below. Return valid JSON ONLY matching 
       "entries": [
         {
           "id": "edu-1",
-          "title": "Degree",
-          "subtitle": "Institution",
+          "title": "Degree Name",
+          "subtitle": "Institution Name",
           "date": "Year"
         }
       ]
@@ -82,7 +84,7 @@ Extract resume information from the text below. Return valid JSON ONLY matching 
         {
           "id": "proj-1",
           "title": "Project Name",
-          "description": "Details",
+          "description": "Project overview",
           "bullets": ["Detail 1"]
         }
       ]
@@ -108,25 +110,14 @@ ${text}
     parsedData.rawText = text;
     parsedData.templateId = parsedData.templateId || 'professional-classic';
 
-    // GUARANTEED STRUCTURE SANITIZER: Prevent text overlapping and column bleeding
+    // Sanitizer to ensure all array structures exist
     if (parsedData.sections) {
       parsedData.sections.forEach((sec: any) => {
-        if (sec.type === 'experience' && sec.entries) {
+        if (sec.entries) {
           sec.entries.forEach((entry: any, index: number) => {
-            entry.id = `exp-${index + 1}`;
-            // Ensure bullets are clean string arrays
-            if (typeof entry.bullets === 'string') {
-              entry.bullets = [entry.bullets];
-            }
-            if (!Array.isArray(entry.bullets)) {
-              entry.bullets = [];
-            }
-            // Fallback splits if Gemini merged fields into title/subtitle
-            if (!entry.subtitle && entry.title && entry.title.includes('-')) {
-              const parts = entry.title.split('-');
-              entry.title = parts[0].trim();
-              entry.subtitle = parts[1].trim();
-            }
+            if (!entry.id) entry.id = `entry-${index + 1}`;
+            if (typeof entry.bullets === 'string') entry.bullets = [entry.bullets];
+            if (!Array.isArray(entry.bullets)) entry.bullets = [];
           });
         }
       });
@@ -134,38 +125,7 @@ ${text}
 
     return parsedData;
   } catch (error: any) {
-    console.error("Parser Fallback Triggered:", error);
-    
-    // SAFE FALLBACK: If AI fails entirely, return a cleanly formatted baseline structure
-    return {
-      contact: { name: "MOHD SOHAIL", email: "warsi.sahil93@gmail.com", phone: "8630875543", linkedin: "linkedin.com/in/mohd-sohail-76078910b" },
-      sections: [
-        {
-          id: "summary",
-          title: "Professional Summary",
-          type: "summary",
-          content: "Analytical Operations and Data Analyst with over 6 years of experience optimizing business workflows and CRM management."
-        },
-        {
-          id: "experience",
-          title: "Professional Experience",
-          type: "experience",
-          entries: [
-            {
-              id: "exp-1",
-              title: "Assistant Manager",
-              subtitle: "M1xchange",
-              date: "Nov 2025 - Present",
-              bullets: [
-                "Oversee end-to-end operational transactions exceeding ₹250 Cr on the TREDS platform.",
-                "Develop comprehensive MIS reports to monitor transaction volumes and settlement cycles."
-              ]
-            }
-          ]
-        }
-      ],
-      rawText: text,
-      templateId: 'professional-classic'
-    };
+    console.error("Gemini Parsing Error:", error);
+    throw error;
   }
 }
