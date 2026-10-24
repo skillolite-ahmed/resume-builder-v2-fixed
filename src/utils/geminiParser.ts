@@ -18,7 +18,7 @@ export async function parseResumeWithGemini(rawText: string) {
   }
 
   const model = new GoogleGenerativeAI(apiKey).getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-pro',
   });
 
   const prompt = `
