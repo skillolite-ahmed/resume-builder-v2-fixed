@@ -24,9 +24,9 @@ export async function parseResumeWithGemini(rawText: string): Promise<ResumeData
 
   const prompt = `
 You are an expert resume parsing engine for a React Resume Builder app.
-Analyze the resume text below and return valid JSON ONLY. No markdown ticks, no conversational text.
+Analyze the resume text and return valid JSON ONLY. No markdown, no conversational text.
 
-Return JSON matching this exact structure:
+MANDATORY JSON STRUCTURE:
 {
   "contact": {
     "name": "string",
@@ -51,11 +51,11 @@ Return JSON matching this exact structure:
       "entries": [
         {
           "id": "exp-1",
-          "title": "Job Title e.g. Assistant Manager",
-          "subtitle": "Company Name e.g. M1xchange",
+          "title": "Job Title ONLY (e.g. Assistant Manager)",
+          "subtitle": "Company Name ONLY (e.g. M1xchange)",
           "location": "Location if present",
-          "date": "Date range e.g. Nov 2025 - Present",
-          "bullets": ["Bullet 1", "Bullet 2"]
+          "date": "Date range ONLY (e.g. Nov 2025 - Present)",
+          "bullets": ["Action bullet 1", "Action bullet 2"]
         }
       ]
     },
@@ -88,7 +88,7 @@ Return JSON matching this exact structure:
         {
           "id": "proj-1",
           "title": "Project Name",
-          "description": "Project details...",
+          "description": "Project details",
           "bullets": ["Detail 1"]
         }
       ]
@@ -98,10 +98,10 @@ Return JSON matching this exact structure:
   "templateId": "professional-classic"
 }
 
-CRITICAL RULES:
-1. Fix OCR spacing or text scrambling (e.g. separate titles, companies, dates).
-2. Ensure every job entry has its own 'title', 'subtitle', 'date', and 'bullets'.
-3. Return ONLY the raw JSON object.
+STRICT RULES:
+1. NEVER mix job titles, company names, and dates into a single field. Keep 'title', 'subtitle', 'location', and 'date' strictly separated.
+2. Ensure every job bullet point is extracted as an item in the 'bullets' array, NOT lumped into a single paragraph string.
+3. Return ONLY raw JSON.
 
 Resume text:
 ${text}
@@ -119,6 +119,23 @@ ${text}
     const parsedData = JSON.parse(jsonMatch[0]);
     parsedData.rawText = text;
     parsedData.templateId = parsedData.templateId || 'professional-classic';
+
+    // Post-processing sanitizer to ensure bullets are always arrays
+    if (parsedData.sections) {
+      parsedData.sections.forEach((sec: any) => {
+        if (sec.entries) {
+          sec.entries.forEach((entry: any) => {
+            if (typeof entry.bullets === 'string') {
+              entry.bullets = [entry.bullets];
+            }
+            if (!Array.isArray(entry.bullets)) {
+              entry.bullets = [];
+            }
+          });
+        }
+      });
+    }
+
     return parsedData;
   } catch (error: any) {
     console.error("Gemini Parsing Error:", error);
