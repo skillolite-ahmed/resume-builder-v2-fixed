@@ -17,44 +17,91 @@ export async function parseResumeWithGemini(rawText: string) {
     throw new Error('Missing VITE_GEMINI_API_KEY');
   }
 
+  // Using gemini-pro for universal v1 compatibility
   const model = new GoogleGenerativeAI(apiKey).getGenerativeModel({
     model: 'gemini-pro',
   });
 
   const prompt = `
-You are an expert resume parsing engine.
+You are an expert resume parsing engine for a React Resume Builder app.
+Analyze the resume text below and return valid JSON ONLY. No markdown ticks, no extra text.
 
-Return valid JSON only, matching this exact shape:
+Return JSON matching this exact structure:
 {
-  contact: { name: string, email?: string, phone?: string, location?: string, linkedin?: string, github?: string, website?: string },
-  sections: [
+  "contact": {
+    "name": "string",
+    "email": "string",
+    "phone": "string",
+    "location": "string",
+    "linkedin": "string",
+    "github": "string",
+    "website": "string"
+  },
+  "sections": [
     {
-      id: string,
-      title: string,
-      type: "summary" | "experience" | "education" | "skills" | "projects" | "certifications" | "awards" | "publications" | "languages" | "custom",
-      content?: string,
-      entries?: [
-        { id: string, title?: string, subtitle?: string, date?: string, location?: string, description?: string, bullets?: string[], metadata?: { [key: string]: string }, rawText?: string }
-      ],
-      skillCategories?: [ { category?: string, skills: string[] } ],
-      rawText?: string
+      "id": "summary",
+      "title": "Professional Summary",
+      "type": "summary",
+      "content": "string"
+    },
+    {
+      "id": "experience",
+      "title": "Professional Experience",
+      "type": "experience",
+      "entries": [
+        {
+          "id": "unique-id-1",
+          "title": "Job Title e.g. Assistant Manager",
+          "subtitle": "Company Name e.g. M1xchange",
+          "location": "Location if present",
+          "date": "Date range e.g. Nov 2025 - Present",
+          "bullets": ["Bullet 1", "Bullet 2"]
+        }
+      ]
+    },
+    {
+      "id": "skills",
+      "title": "Skills",
+      "type": "skills",
+      "skillCategories": [
+        { "category": "Technical", "skills": ["SQL", "Python", "Power BI"] }
+      ]
+    },
+    {
+      "id": "education",
+      "title": "Education & Certifications",
+      "type": "education",
+      "entries": [
+        {
+          "id": "edu-1",
+          "title": "Degree Name",
+          "subtitle": "Institution Name",
+          "date": "Year"
+        }
+      ]
+    },
+    {
+      "id": "projects",
+      "title": "Projects",
+      "type": "projects",
+      "entries": [
+        {
+          "id": "proj-1",
+          "title": "Project Name",
+          "description": "Project details...",
+          "bullets": ["Detail 1"]
+        }
+      ]
     }
   ],
-  rawText: string,
-  templateId: "professional-classic",
-  density?: "auto" | "compact" | "spacious"
+  "rawText": "",
+  "templateId": "professional-classic"
 }
 
-CRITICAL RULES FOR SCRAPED PDF TEXT:
-1. Fix OCR errors: "SOL" -> "SQL", "Power El" -> "Power BI", "MIxchange" -> "M1xchange".
-2. The input text is highly scrambled. Job titles, dates, and companies are mixed up.
-3. Carefully reconstruct the Experience section. ALWAYS separate the Job Title (title), Company (subtitle), Location (location), and Dates (date) into their exact fields.
-4. Example mapping:
-   "Senior Relationship Manager - EnKash Gurugram Jun 2022 Sep 2023"
-   MUST become:
-   title: "Senior Relationship Manager", subtitle: "EnKash", location: "Gurugram", date: "Jun 2022 - Sep 2023".
-5. Treat sentences that start with bullet points or action verbs as 'bullets' inside the entry. DO NOT use job responsibilities as job titles.
-6. Return ONLY JSON. No markdown blocks.
+CRITICAL RULES:
+1. Fix OCR spacing or text scrambling (e.g. separate titles, companies, dates).
+2. Ensure every job entry has its own 'title' (role), 'subtitle' (company), 'date', and 'bullets'.
+3. Return ONLY the raw JSON object.
 
 Resume text:
 ${text}
@@ -69,9 +116,11 @@ ${text}
       throw new Error("AI did not return a valid JSON object.");
     }
     
-    return JSON.parse(jsonMatch[0]);
+    const parsedData = JSON.parse(jsonMatch[0]);
+    parsedData.rawText = text;
+    return parsedData;
   } catch (error: any) {
-    console.error("Gemini API Error:", error);
-    throw new Error(error.message || 'Failed to generate AI content');
+    console.error("Gemini Parsing Error:", error);
+    throw error;
   }
 }
