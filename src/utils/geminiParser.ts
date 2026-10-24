@@ -340,11 +340,10 @@ CRITICAL RULES:
 10. If the input is malformed or partial, still return a structurally valid object with best-effort parsing.
 `;
 
-  const model = genAI.getGenerativeModel({
-    model: modelName,
-    systemInstruction,
-  });
-
+  const model = new GoogleGenerativeAI(apiKey).getGenerativeModel({
+  model: 'gemini-pro',
+});
+  
   const generationConfig = {
     temperature: 0.1,
     topP: 0.8,
