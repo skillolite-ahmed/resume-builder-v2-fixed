@@ -53,8 +53,6 @@ export default function App() {
       setActiveTab('editor');
     } catch (err: any) {
       console.error('Gemini parsing failed, falling back to local parser:', err);
-      alert(`Gemini AI failed: ${err.message}. Falling back to standard parser.`);
-      
       const fallback = parseResume(inputText);
       setResumeData(fallback);
       setActiveTab('editor');
@@ -62,6 +60,7 @@ export default function App() {
       setIsParsing(false);
     }
   };
+  
   // Reference samples are preview-only: never place sample content in the user's paste box.
   // Choosing the blank option clears all current content, including previously pasted data.
   const handleLoadSample = (sampleId: string) => {
